@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <style>
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .logo {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700 0%, #ff9800 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            box-shadow: 0 2px 8px #0003;
+        }
+        .move-button[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -32px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #232526ee;
+            color: #ffd700;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .result {
+            transition: color 0.3s, transform 0.3s;
+        }
+        .result.animated {
+            color: #ff9800;
+            transform: scale(1.15);
+        }
+        .play-again-btn {
+            background: linear-gradient(90deg, #00e676 0%, #00bcd4 100%);
+            color: #232526;
+            border: none;
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 8px 24px;
+            border-radius: 20px;
+            margin-top: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #0002;
+            transition: background 0.2s, transform 0.15s;
+            letter-spacing: 1px;
+            display: none;
+        }
+        .play-again-btn.show {
+            display: inline-block;
+        }
+        footer {
+            margin-top: 40px;
+            color: #bbb;
+            font-size: 0.95rem;
+            text-align: center;
+            opacity: 0.7;
+        }
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #232526 0%, #414345 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .game-card {
+            background: rgba(255,255,255,0.10);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.18);
+            padding: 40px 32px 32px 32px;
+            margin-top: 40px;
+            width: 370px;
+            max-width: 95vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 2.6rem;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-family: 'Montserrat', 'Segoe UI', Arial, Helvetica, sans-serif;
+            background: linear-gradient(90deg, #ffd700 0%, #ff9800 50%, #00e676 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 12px #0008, 0 1px 0 #fff2;
+            position: relative;
+        }
+        .title::after {
+            content: '';
+            display: block;
+            width: 60%;
+            height: 4px;
+            margin: 12px auto 0 auto;
+            background: linear-gradient(90deg, #ffd700 0%, #ff9800 50%, #00e676 100%);
+            border-radius: 2px;
+            opacity: 0.7;
+        }
+
+        .move-icon {
+            height: 60px;
+            transition: transform 0.2s, filter 0.2s;
+            filter: drop-shadow(0 2px 6px #0006);
+        }
+
+        .move-button {
+            background: rgba(255,255,255,0.18);
+            border: 2px solid #fff;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            margin: 0 16px 0 0;
+            cursor: pointer;
+            box-shadow: 0 2px 12px #0003;
+            transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s, background 0.18s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            outline: none;
+        }
+        .move-button:last-child {
+            margin-right: 0;
+        }
+        .move-button:hover {
+            transform: scale(1.12);
+            box-shadow: 0 8px 32px #ffd70044;
+            border-color: #ffd700;
+            background: rgba(255,255,255,0.28);
+        }
+        .move-button.selected {
+            box-shadow: 0 12px 36px #00e67666;
+            transform: scale(1.14);
+            border-color: #00e676;
+            background: linear-gradient(90deg, rgba(0,230,118,0.14), rgba(255,255,255,0.22));
+        }
+        .move-button:active .move-icon {
+            transform: scale(0.92);
+            filter: brightness(1.2);
+        }
+
+        .result {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 32px;
+            min-height: 40px;
+            text-align: center;
+            color: #ffd700;
+            text-shadow: 0 2px 8px #0008;
+            letter-spacing: 1px;
+        }
+
+        .score {
+            margin-top: 18px;
+            font-size: 1.2rem;
+            background: rgba(255,255,255,0.13);
+            border-radius: 10px;
+            padding: 10px 24px;
+            box-shadow: 0 2px 8px #0002;
+            color: #00e676;
+            font-weight: 500;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .reset-score-button {
+            background: linear-gradient(90deg, #ffd700 0%, #ff9800 100%);
+            color: #232526;
+            border: none;
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 10px 28px;
+            border-radius: 24px;
+            margin-top: 28px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #0003;
+            transition: background 0.2s, transform 0.15s;
+            letter-spacing: 1px;
+        }
+        .reset-score-button:hover {
+            background: linear-gradient(90deg, #ff9800 0%, #ffd700 100%);
+            transform: scale(1.07);
+        }
+        @media (max-width: 500px) {
+            .game-card {
+                padding: 18px 6vw 18px 6vw;
+                width: 98vw;
+            }
+            .title {
+                font-size: 1.3rem;
+            }
+            .move-button {
+                width: 60px;
+                height: 60px;
+            }
+            .move-icon {
+                height: 36px;
+            }
+            .result {
+                font-size: 1.1rem;
+            }
+            .score {
+                font-size: 1rem;
+                padding: 8px 8vw;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sound Effects -->
+    <audio id="win-sound" src="Audio/Segun-Johnson-.mp3" preload="auto"></audio>
+    <audio id="lose-sound" src="Audio/Funny-laugh-no-no-no.mp3" preload="auto"></audio>
+    <audio id="tie-sound" src="Audio/sfx-defeat5.mp3" preload="auto"></audio>
+    <div class="game-card">
+        <div class="header">
+            <span class="logo">🎮</span>
+            <p class="title">Rock Paper Scissors</p>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:8px; width:100%; max-width:320px;">
+            <div style="font-size:0.95rem; color:#ddd;">Rounds: <span class="js-rounds">0</span></div>
+            <button id="sound-toggle" style="margin-left:auto; background:#ffd700; color:#232526; border:none; padding:6px 12px; border-radius:12px; cursor:pointer; font-weight:600;">🔊 Sound</button>
+        </div>
+        <div style="display: flex; justify-content: center; margin-bottom: 18px;" role="group" aria-label="Choose your move">
+            <button data-move="rock" onclick="playGame('rock');" class="move-button" aria-label="Rock" title="Choose Rock">
+                <img src="images/rock-emoji.png" class="move-icon" alt="Rock">
+            </button>
+            <button data-move="paper" onclick="playGame('paper');" class="move-button" aria-label="Paper" title="Choose Paper">
+                <img src="images/paper-emoji.png" class="move-icon" alt="Paper">
+            </button>
+            <button data-move="scissors" onclick="playGame('scissors');" class="move-button" aria-label="Scissors" title="Choose Scissors">
+                <img src="images/scissors-emoji.png" class="move-icon" alt="Scissors">
+            </button>
+        </div>
+        <p style="font-size:0.95rem; color:#ddd; margin-top:8px; text-align:center;">Tip: Click an icon or press R (Rock), P (Paper), S (Scissors) on your keyboard.</p>
+        <p class="js-result result"></p>
+        <button class="play-again-btn" onclick="playAgain()">Play Again</button>
+        <p class="js-moves" style="font-size: 1.1rem; margin-top: 14px; text-align: center;"></p>
+        <p class="js-score score"></p>
+        <button onclick="score.wins = 0; score.losses = 0; score.ties = 0; localStorage.removeItem('score'); updateScoreElement();" class="reset-score-button">Reset Score</button>
+    </div>
+    <footer>
+        &copy; 2025 Rock Paper Scissors Game By Otunba. All rights reserved.
+    </footer>
+    <script src="script.js"></script>
+    <script>
+        
+    </script>
+</body>
+
+</html>
